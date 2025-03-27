@@ -4,6 +4,8 @@ import json
 import asyncio
 import time
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 ALLOWED_CHANNEL_ID = 1354769726261428224  # Channel where bot is allowed to run
