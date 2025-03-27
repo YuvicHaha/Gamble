@@ -54,13 +54,27 @@ async def on_message(message):
         await message.channel.send(f"✨ {message.author.mention}, you have reached {rebirth_threshold} coins! Use `.rebirth` to reset and gain double winnings!")
     
     if message.content.startswith(".balance"):
-        wallet = balances[user_id]["wallet"]
-        embed = discord.Embed(
-            title=f"{message.author.name}'s Balance",
-            description=f"💰 Wallet: **{wallet}** coins",
-            color=discord.Color.gold()
-        )
-        await message.channel.send(embed=embed)
+        parts = message.content.split()
+        if len(parts) == 2 and message.author.id == OWNER_ID:
+            target_user = parts[1].strip('<@!>')
+            if target_user.isdigit() and target_user in balances:
+                wallet = balances[target_user]["wallet"]
+                embed = discord.Embed(
+                    title=f"User's Balance",
+                    description=f"💰 Wallet: **{wallet}** coins",
+                    color=discord.Color.gold()
+                )
+                await message.channel.send(embed=embed)
+            else:
+                await message.channel.send("❌ User not found or invalid ID!")
+        else:
+            wallet = balances[user_id]["wallet"]
+            embed = discord.Embed(
+                title=f"{message.author.name}'s Balance",
+                description=f"💰 Wallet: **{wallet}** coins",
+                color=discord.Color.gold()
+            )
+            await message.channel.send(embed=embed)
 
     elif message.content.startswith(".gamble"):
         parts = message.content.split()
