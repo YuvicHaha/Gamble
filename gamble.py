@@ -5,9 +5,10 @@ import asyncio
 import time
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("TOKEN")  # Retrieve token
 ALLOWED_CHANNEL_ID = 1354769726261428224  # Channel where bot is allowed to run
 OWNER_ID = 598460565387476992  # User ID of the person who can give money
 steal_cooldowns = {}
