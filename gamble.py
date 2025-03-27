@@ -79,7 +79,7 @@ async def on_message(message):
             await message.channel.send("❌ You don't have enough coins in your wallet!")
             return
         
-        outcome = "win" if random.randint(1, 100) <= 40 else "lose"
+        outcome = "win" if random.randint(1, 100) <= 45 else "lose"
         multiplier = 2 ** balances[user_id]["rebirth"]
         
         if outcome == "win":
