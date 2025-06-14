@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TOKEN = os.getenv("TOKEN")  # Retrieve token
-ALLOWED_CHANNEL_ID = 1354769726261428224  # Channel where bot is allowed to run
-OWNER_IDS = [598460565387476992, 123456789012345678, 987654321098765432]  # Add more owner user IDs here
+TOKEN = os.getenv("TOKEN") 
+ALLOWED_CHANNEL_ID = 1354769726261428224 
+OWNER_IDS = [598460565387476992, 1279868613628657860, 1272478153201422420]  # Add more owner user IDs here
 steal_cooldowns = {}
 work_cooldowns = {}
 
