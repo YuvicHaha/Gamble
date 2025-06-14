@@ -10,7 +10,7 @@ load_dotenv()
 
 TOKEN = os.getenv("TOKEN")  # Retrieve token
 ALLOWED_CHANNEL_ID = 1354769726261428224  # Channel where bot is allowed to run
-OWNER_ID = 598460565387476992  # User ID of the person who can give money
+OWNER_IDS = [598460565387476992, 123456789012345678, 987654321098765432]  # Add more owner user IDs here
 steal_cooldowns = {}
 work_cooldowns = {}
 
@@ -39,23 +39,27 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:
         return
-    
+
     if message.channel.id != ALLOWED_CHANNEL_ID and not message.content.startswith(".work"):
         return
-    
+
     balances = load_balances()
     user_id = str(message.author.id)
-    
+
     if user_id not in balances or not isinstance(balances[user_id], dict):
         balances[user_id] = {"wallet": 1000, "rebirth": 0}
 
-    rebirth_threshold = (balances[user_id]["rebirth"] + 1) * 20000 - 10000  # 10k, 30k, 60k, 90k, etc.
+    # Reminder if balance is 0
+    if balances[user_id]["wallet"] <= 0:
+        await message.channel.send(f"😓 {message.author.mention}, you're out of coins! Use `.work` to gain money!")
+
+    rebirth_threshold = (balances[user_id]["rebirth"] + 1) * 20000 - 10000
     if balances[user_id]["wallet"] >= rebirth_threshold:
-        await message.channel.send(f"✨ {message.author.mention}, you have reached {rebirth_threshold} coins! Use `.rebirth` to reset and gain double winnings!")
-    
+        await message.channel.send(f"✨ {message.author.mention}, you have reached {rebirth_threshold} coins! Use `.rebirth` to reset and gain higher winnings!")
+
     if message.content.startswith(".balance"):
         parts = message.content.split()
-        if len(parts) == 2 and message.author.id == OWNER_ID:
+        if len(parts) == 2 and message.author.id == OWNER_IDS:
             target_user = parts[1].strip('<@!>')
             if target_user.isdigit() and target_user in balances:
                 wallet = balances[target_user]["wallet"]
@@ -81,23 +85,23 @@ async def on_message(message):
         if len(parts) != 2 or not parts[1].isdigit():
             await message.channel.send("❌ Usage: .gamble <amount>")
             return
-        
+
         amount = int(parts[1])
         wallet = balances[user_id]["wallet"]
-        
+
         if amount <= 0:
             await message.channel.send("❌ Invalid bet amount!")
             return
-        
+
         if amount > wallet:
             await message.channel.send("❌ You don't have enough coins in your wallet!")
             return
-        
+
         outcome = "win" if random.randint(1, 100) <= 45 else "lose"
-        multiplier = 2 ** balances[user_id]["rebirth"]
-        
+        multiplier = 1 + (0.2 * balances[user_id]["rebirth"])
+
         if outcome == "win":
-            winnings = amount * multiplier
+            winnings = int(amount * multiplier)
             wallet += winnings
             result = f"🎉 You won {winnings} coins!"
             color = discord.Color.green()
@@ -105,10 +109,10 @@ async def on_message(message):
             wallet -= amount
             result = f"💀 You lost {amount} coins!"
             color = discord.Color.red()
-        
+
         balances[user_id]["wallet"] = wallet
         save_balances(balances)
-        
+
         embed = discord.Embed(
             title="🎲 Gambling Result",
             description=result,
@@ -116,13 +120,13 @@ async def on_message(message):
         )
         embed.add_field(name="New Wallet Balance", value=f"💰 {wallet} coins", inline=False)
         await message.channel.send(embed=embed)
-    
+
     elif message.content.startswith(".rebirth"):
         if balances[user_id]["wallet"] >= rebirth_threshold:
             balances[user_id]["wallet"] = 1000
             balances[user_id]["rebirth"] += 1
             save_balances(balances)
-            await message.channel.send(f"🌟 {message.author.mention}, you have rebirthed! Your balance has been reset, but your winnings now increase by 0.10x per rebirth!")
+            await message.channel.send(f"🌟 {message.author.mention}, you have rebirthed! Your balance has been reset, and your winnings now increase by +0.2x per rebirth! Total multiplier: {1 + 0.2 * balances[user_id]['rebirth']:.1f}x")
         else:
             await message.channel.send(f"❌ You need at least {rebirth_threshold} coins to rebirth!")
     
@@ -134,7 +138,7 @@ async def on_message(message):
             embed.add_field(name=f"#{i} {user.name}", value=f"💰 {data['wallet']} coins", inline=False)
         await message.channel.send(embed=embed)
     
-    elif message.content.startswith(".givemoney") and message.author.id == OWNER_ID:
+    elif message.content.startswith(".givemoney") and message.author.id == OWNER_IDS:
         parts = message.content.split()
         if len(parts) != 2 or not parts[1].isdigit():
             await message.channel.send("❌ Usage: .givemoney <amount>")
@@ -145,7 +149,7 @@ async def on_message(message):
             balances[user]["wallet"] += amount
         save_balances(balances)
         await message.channel.send(f"💰 {amount} coins have been given to everyone by {message.author.mention}!")
-    elif message.content.startswith(".reset") and message.author.id == OWNER_ID:
+    elif message.content.startswith(".reset") and message.author.id == OWNER_IDS:
         parts = message.content.split()
         if len(parts) != 2 or not parts[1].isdigit():
             await message.channel.send("❌ Usage: .reset <user_id>")
@@ -160,7 +164,7 @@ async def on_message(message):
         save_balances(balances)
         await message.channel.send(f"🔄 {message.author.mention} has reset <@{target_id}>'s balance to 1000 coins!")
 
-    elif message.content.startswith(".give") and message.author.id == OWNER_ID:
+    elif message.content.startswith(".give") and message.author.id == OWNER_IDS:
         parts = message.content.split()
         if len(parts) != 3 or not parts[2].isdigit():
             await message.channel.send("❌ Usage: .give @user <amount>")
@@ -202,7 +206,7 @@ async def on_message(message):
             await message.channel.send("❌ Target does not have enough coins!")
             return
         
-        if random.randint(1, 100) <= 2:
+        if random.randint(1, 100) <= 25:
             balances[user_id]["wallet"] += amount
             balances[target_id]["wallet"] -= amount
             await message.channel.send(f"💰 {message.author.mention} successfully stole {amount} coins from {target.mention}!")
