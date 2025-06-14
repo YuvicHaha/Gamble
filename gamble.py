@@ -10,7 +10,7 @@ load_dotenv()
 
 TOKEN = os.getenv("TOKEN") 
 ALLOWED_CHANNEL_ID = 1354769726261428224 
-OWNER_IDS = [598460565387476992, 1279868613628657860, 1272478153201422420]  # Add more owner user IDs here
+OWNER_ID = 598460565387476992
 steal_cooldowns = {}
 work_cooldowns = {}
 
@@ -59,7 +59,7 @@ async def on_message(message):
 
     if message.content.startswith(".balance"):
         parts = message.content.split()
-        if len(parts) == 2 and message.author.id == OWNER_IDS:
+        if len(parts) == 2 and message.author.id == OWNER_ID:
             target_user = parts[1].strip('<@!>')
             if target_user.isdigit() and target_user in balances:
                 wallet = balances[target_user]["wallet"]
@@ -138,7 +138,7 @@ async def on_message(message):
             embed.add_field(name=f"#{i} {user.name}", value=f"💰 {data['wallet']} coins", inline=False)
         await message.channel.send(embed=embed)
     
-    elif message.content.startswith(".givemoney") and message.author.id == OWNER_IDS:
+    elif message.content.startswith(".givemoney") and message.author.id == OWNER_ID:
         parts = message.content.split()
         if len(parts) != 2 or not parts[1].isdigit():
             await message.channel.send("❌ Usage: .givemoney <amount>")
@@ -149,7 +149,7 @@ async def on_message(message):
             balances[user]["wallet"] += amount
         save_balances(balances)
         await message.channel.send(f"💰 {amount} coins have been given to everyone by {message.author.mention}!")
-    elif message.content.startswith(".reset") and message.author.id == OWNER_IDS:
+    elif message.content.startswith(".reset") and message.author.id == OWNER_ID:
         parts = message.content.split()
         if len(parts) != 2 or not parts[1].isdigit():
             await message.channel.send("❌ Usage: .reset <user_id>")
@@ -164,7 +164,7 @@ async def on_message(message):
         save_balances(balances)
         await message.channel.send(f"🔄 {message.author.mention} has reset <@{target_id}>'s balance to 1000 coins!")
 
-    elif message.content.startswith(".give") and message.author.id == OWNER_IDS:
+    elif message.content.startswith(".give") and message.author.id == OWNER_ID:
         parts = message.content.split()
         if len(parts) != 3 or not parts[2].isdigit():
             await message.channel.send("❌ Usage: .give @user <amount>")
