@@ -31,7 +31,6 @@ OWNER_ID = 598460565387476992
 steal_cooldowns = {}
 work_cooldowns = {}
 
-# Load user balances from a JSON file
 def load_balances():
     try:
         with open("balances.json", "r") as f:
