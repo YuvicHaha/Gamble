@@ -1,3 +1,20 @@
+from flask import Flask
+import threading
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is alive!"
+
+def run_web():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = threading.Thread(target=run_web)
+    t.start()
+
+
 import discord
 import random
 import json
@@ -283,5 +300,5 @@ async def on_message(message):
         embed.add_field(name=".steal @user <amount>", value="Attempt to steal coins from another user. 🚔", inline=False)
         embed.add_field(name=".work", value="Answer math questions to earn money! 📚", inline=False)
         await message.channel.send(embed=embed)
-
+keep_alive()
 client.run(TOKEN)
