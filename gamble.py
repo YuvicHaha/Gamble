@@ -283,7 +283,7 @@ async def on_message(message):
         except discord.Forbidden:
             await message.channel.send("❌ I couldn't DM you! Please enable direct messages.")
   
-    elif message.content.startswith(".help"):
+    elif message.content.startswith(".how"):
         embed = discord.Embed(
             title="🛠️ Bot Commands",
             description="Here are the available commands:",
@@ -301,4 +301,5 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 keep_alive()
 client.run(TOKEN)
+
 
