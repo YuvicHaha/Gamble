@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN") 
-ALLOWED_CHANNEL_ID = 1354769726261428224 
+ALLOWED_CHANNEL_ID = 1480219197131849750 
 OWNER_ID = 598460565387476992
 steal_cooldowns = {}
 work_cooldowns = {}
@@ -301,3 +301,4 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 keep_alive()
 client.run(TOKEN)
+
